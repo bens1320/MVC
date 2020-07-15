@@ -11285,7 +11285,91 @@ if ( typeof noGlobal === "undefined" ) {
 return jQuery;
 } );
 
-},{"process":"../../../../../../../.config/yarn/global/node_modules/process/browser.js"}],"app1.js":[function(require,module,exports) {
+},{"process":"../../../../../../../.config/yarn/global/node_modules/process/browser.js"}],"../base/Model.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+var Model =
+/*#__PURE__*/
+function () {
+  function Model(options) {
+    var _this = this;
+
+    _classCallCheck(this, Model);
+
+    ['data', 'create', 'delete', 'update', 'get'].forEach(function (key) {
+      if (key in options) {
+        _this[key] = options[key];
+      }
+    });
+  }
+
+  _createClass(Model, [{
+    key: "create",
+    value: function create() {
+      console && console.error && console.error("你还没有实现, create");
+    }
+  }, {
+    key: "delete",
+    value: function _delete() {
+      console && console.error && console.error("你还没有实现, delete");
+    }
+  }, {
+    key: "update",
+    value: function update() {
+      console && console.error && console.error("你还没有实现, update");
+    }
+  }, {
+    key: "get",
+    value: function get() {
+      console && console.error && console.error("你还没有实现, get");
+    }
+  }]);
+
+  return Model;
+}();
+
+var _default = Model;
+exports.default = _default;
+},{}],"../base/View.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _jquery = _interopRequireDefault(require("jquery"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var View = function View(_ref) {
+  var el = _ref.el,
+      html = _ref.html,
+      render = _ref.render;
+
+  _classCallCheck(this, View);
+
+  this.el = (0, _jquery.default)(el);
+  this.html = html;
+  this.render = render;
+};
+
+var _default = View;
+exports.default = _default;
+},{"jquery":"../node_modules/jquery/dist/jquery.js"}],"app1.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -11297,50 +11381,51 @@ require("./app1.css");
 
 var _jquery = _interopRequireDefault(require("jquery"));
 
+var _Model = _interopRequireDefault(require("../base/Model"));
+
+var _View = _interopRequireDefault(require("../base/View"));
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var eventBus = (0, _jquery.default)(window); // 数据相关: m
 
-var m = {
-  //初始化数据
+var m = new _Model.default({
   data: {
     n: parseInt(localStorage.getItem("n")) || 100
   },
-  create: function create() {},
-  delete: function _delete() {},
   update: function update(data) {
     //把data所有属性赋值给m.data
     Object.assign(m.data, data); //eventBus.trigger不能用空格
 
     eventBus.trigger("m:updated");
     localStorage.setItem("n", m.data.n);
-  },
-  get: function get() {}
-}; // 视图相关:v
-
-var v = {
-  el: null,
-  html: "\n    <div>\n        <div class=\"output\">\n            <span id=\"number\">{{n}}</span>\n        </div>\n        <div class=\"actions\">\n            <button id=\"add1\">+1</button>\n            <button id=\"subtract\">-1</button>\n            <button id=\"multiply\">*2</button>\n            <button id=\"divide\">/2</button>\n        </div>\n    </div>\n    ",
-  init: function init(container) {
-    v.el = (0, _jquery.default)(container);
-  },
-  render: function render(n) {
-    if (v.el.children().length !== 0) {
-      v.el.empty();
-    }
-
-    (0, _jquery.default)(v.html.replace("{{n}}", n)).appendTo((0, _jquery.default)(v.el));
   }
-}; // 其他: c
+}); // 视图相关:v
+// 其他: c
 
 var c = {
-  init: function init(container) {
-    v.init(container); // view = render(data)
+  v: null,
+  initV: function initV() {
+    c.v = new _View.default({
+      el: c.container,
+      html: "\n                <div>\n                    <div class=\"output\">\n                        <span id=\"number\">{{n}}</span>\n                    </div>\n                    <div class=\"actions\">\n                        <button id=\"add1\">+1</button>\n                        <button id=\"subtract\">-1</button>\n                        <button id=\"multiply\">*2</button>\n                        <button id=\"divide\">/2</button>\n                    </div>\n                </div> \n            ",
+      render: function render(n) {
+        if (c.v.el.children().length !== 0) {
+          c.v.el.empty();
+        }
 
-    v.render(m.data.n);
+        (0, _jquery.default)(c.v.html.replace("{{n}}", n)).appendTo((0, _jquery.default)(c.v.el));
+      }
+    });
+  },
+  init: function init(container) {
+    c.container = container;
+    c.initV(); // view = render(data)
+
+    c.v.render(m.data.n);
     c.autoBindEvents();
     eventBus.on("m:updated", function () {
-      v.render(m.data.n);
+      c.v.render(m.data.n);
     });
   },
   events: {
@@ -11375,13 +11460,13 @@ var c = {
       var spaceIndex = key.indexOf(" ");
       var part1 = key.slice(0, spaceIndex);
       var part2 = key.slice(spaceIndex + 1);
-      v.el.on(part1, part2, value);
+      c.v.el.on(part1, part2, value);
     }
   }
 };
 var _default = c;
 exports.default = _default;
-},{"./app1.css":"app1.css","jquery":"../node_modules/jquery/dist/jquery.js"}],"app2.css":[function(require,module,exports) {
+},{"./app1.css":"app1.css","jquery":"../node_modules/jquery/dist/jquery.js","../base/Model":"../base/Model.js","../base/View":"../base/View.js"}],"app2.css":[function(require,module,exports) {
 var reloadCSS = require('_css_loader');
 
 module.hot.dispose(reloadCSS);
@@ -11568,7 +11653,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "57271" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "58996" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
