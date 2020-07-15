@@ -1,17 +1,16 @@
 import "./app2.css"
 import $ from "jquery"
+import Model from "../base/Model";
 
 const eventBus = $(window)
 
-const localKey = "index"
+const localKey = "app2.index"
 // 数据相关: m
-const m = {
+const m = new Model({
     //初始化数据
     data: {
         index: parseInt(localStorage.getItem(localKey)) || 0
     },
-    create(){},
-    delete(){},
     update(data){
         //把data所有属性赋值给m.data
         Object.assign(m.data, data)
@@ -19,11 +18,10 @@ const m = {
         eventBus.trigger("m:updated")
         localStorage.setItem(localKey, m.data.index)
     },
-    get(){}
-}
+})
 
-// 视图相关:v
-const v = {
+// 其他: c
+const view = {
     el: null,
     html:(index) => {
         return`
@@ -40,26 +38,19 @@ const v = {
         `
     },
     init(container){
-        v.el = $(container)
+        view.el = $(container)
+        // view = render(data)
+        view.render(m.data.index)
+        view.autoBindEvents()
+        eventBus.on("m:updated", () => {
+            view.render(m.data.index)
+        })
     },
     render(index){
-        if (v.el.children().length !== 0) {
-            v.el.empty()
+        if (view.el.children().length !== 0) {
+            view.el.empty()
         }
-        $(v.html(index )).appendTo($(v.el))
-    },
-}
-
-// 其他: c
-const c = {
-    init(container){
-        v.init(container)
-        // view = render(data)
-        v.render(m.data.index)
-        c.autoBindEvents()
-        eventBus.on("m:updated", () => {
-            v.render(m.data.index)
-        })
+        $(view.html(index )).appendTo($(view.el))
     },
     events: {
         "click .tab-bar li": "x",
@@ -70,13 +61,13 @@ const c = {
     },
 
     autoBindEvents(){
-        for (let key in c.events) {
-            const value = c[c.events[key]]
+        for (let key in view.events) {
+            const value = view[view.events[key]]
             const spaceIndex = key.indexOf(" ")
             const part1 = key.slice(0, spaceIndex)
             const part2 = key.slice(spaceIndex + 1)
-            v.el.on(part1, part2, value)
+            view.el.on(part1, part2, value)
         }
     }
 }
-export default c
+export default view
