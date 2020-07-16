@@ -1,16 +1,20 @@
 import $ from "jquery"
+import EventBus from "./EventBus";
 
-class View{
+class View extends EventBus{
     // constructor({el, html, render, data, eventBus, events}) {
     constructor(options) {
+        //继承类, 需要调用父类初始化
+        super()
         //options上有什么都放在this上面
         Object.assign(this, options)
         this.el = $(this.el)
         this.render(this.data)
         this.autoBindEvents()
-        this.eventBus.on("m:updated", () => {
+        this.on("m:updated", () => {
             this.render(this.data)
         })
+
     }
     autoBindEvents(){
         for (let key in this.events) {

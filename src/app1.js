@@ -3,7 +3,6 @@ import $ from "jquery"
 import Model from "../base/Model";
 import View from "../base/View";
 
-const eventBus = $(window)
 // 数据相关: m
 const m = new Model({
     data: {
@@ -13,7 +12,7 @@ const m = new Model({
         //把data所有属性赋值给m.data
         Object.assign(m.data, data)
         //eventBus.trigger不能用空格
-        eventBus.trigger("m:updated")
+        m.trigger("m:updated")
         localStorage.setItem("n", m.data.n)
     }
 })
@@ -25,7 +24,6 @@ const init = (el) => {
     new View({
         el: el,
         data: m.data,
-        eventBus: eventBus,
         html: `
             <div>
                 <div class="output">

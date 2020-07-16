@@ -2,8 +2,9 @@ import "./app2.css"
 import $ from "jquery"
 import Model from "../base/Model";
 import View from "../base/View";
+import EventBus from "../base/EventBus";
 
-const eventBus = $(window)
+const eventBus = new EventBus()
 
 const localKey = "app2.index"
 // 数据相关: m

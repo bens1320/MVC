@@ -1,6 +1,11 @@
-class Model{
+import EventBus from "./EventBus";
+
+class Model extends EventBus{
     constructor(options) {
-        ['data', 'create', 'delete', 'update', 'get'].forEach((key) => {
+        //继承类, 需要调用父类初始化
+        super()
+        const keys = ['data', 'create', 'delete', 'update', 'get']
+        keys.forEach((key) => {
             if(key in options){
                 this[key] = options[key]
             }
